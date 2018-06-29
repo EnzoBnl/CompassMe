@@ -17,8 +17,13 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import java.util.List;
 import java.io.IOException;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.widget.TextView;
 
-public class CompassActivity extends AppCompatActivity {
+public class CompassActivity extends AppCompatActivity implements SensorEventListener, StepListener {
     private Location current_location;
     private Compass compass;
     private ImageView arrowView;
@@ -27,6 +32,14 @@ public class CompassActivity extends AppCompatActivity {
     private float currentAzimuth;
     private Location target_location = new Location("");
     private final static int TARGET_REFRESH_DELAY = 3000;
+
+    private TextView textView;
+    private StepSensor simpleStepDetector;
+    private SensorManager sensorManager;
+    private Sensor accel;
+    private static final String SUFFIX = " STEPS";
+    private int numSteps;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,6 +81,35 @@ public class CompassActivity extends AppCompatActivity {
                 handler.postDelayed(this, CompassActivity.TARGET_REFRESH_DELAY);
             }
         }, TARGET_REFRESH_DELAY);
+
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        accel = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        simpleStepDetector = new StepSensor();
+        simpleStepDetector.setListener(this);
+
+        textView = findViewById(R.id.tv_steps);
+        Button BtnStart = findViewById(R.id.btn_start);
+        Button BtnStop = findViewById(R.id.btn_stop);
+
+
+
+        BtnStart.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View arg0) {
+
+                numSteps = 0;
+                sensorManager.registerListener(CompassActivity.this, accel, SensorManager.SENSOR_DELAY_FASTEST);
+
+            }
+        });
+
+
+        BtnStop.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View arg0) {
+
+                sensorManager.unregisterListener(CompassActivity.this);
+
+            }
+        });
     }
 
     protected void update(){
@@ -132,5 +174,20 @@ public class CompassActivity extends AppCompatActivity {
         an.setFillAfter(true);
 
         arrowView.startAnimation(an);
+    }
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            simpleStepDetector.update(event.values[0], event.values[1], event.values[2]);
+        }
+    }
+
+    public void stepOccurred() {
+        numSteps++;
+        textView.setText(numSteps + SUFFIX);
     }
 }
