@@ -88,6 +88,7 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
         simpleStepDetector.setListener(this);
 
         textView = findViewById(R.id.tv_steps);
+        textView.setText("0 STEP");
         Button BtnStart = findViewById(R.id.btn_start);
         Button BtnStop = findViewById(R.id.btn_stop);
 

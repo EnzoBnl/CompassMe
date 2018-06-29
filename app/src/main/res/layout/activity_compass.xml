@@ -16,7 +16,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:layout_above="@+id/btn_start" android:layout_alignStart="@+id/btn_start"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large" android:text="0 STEPS"/>
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"/>
 
 
     <Button

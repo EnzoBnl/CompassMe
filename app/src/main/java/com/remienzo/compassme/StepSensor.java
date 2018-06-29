@@ -9,13 +9,13 @@ public class StepSensor {
     télépohone n'est égale à son vecteur poids qu'à l'arrêt. Le détail est dans la fontion update().
      */
     private static final int SPEED_BUFFER_SIZE = 10;
-    private static final int ACC_BUFFER_SIZE = SPEED_BUFFER_SIZE * SPEED_BUFFER_SIZE;
+    private static final int ACC_BUFFER_SIZE = SPEED_BUFFER_SIZE * 5;
 
     /*
     Vitesse au-delà de laquelle on considère que le téléphone est embarqué dans un pas.
     Cette valeur est complètement empirique et dépend peut-être bien de l'appareil.
      */
-    private static final float BE_THIS_FAST_TO_BE_A_STEP = 50f;
+    private static final float BE_THIS_FAST_TO_BE_A_STEP = 0.2f;
 
     private int bufferedValues = 0; // Nombre de mesures effectuées (pour faire des moyennes propres)
     private float[] accBufferX = new float[ACC_BUFFER_SIZE];
