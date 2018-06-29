@@ -26,7 +26,14 @@
             android:layout_height="wrap_content"
             android:inputType="textPostalAddress"
             android:ems="10"
-            android:layout_alignParentTop="true" android:layout_centerHorizontal="true" android:layout_marginTop="53dp"
-            android:id="@+id/editText"/>
+            android:id="@+id/editText" android:layout_alignParentTop="true"
+            android:layout_alignStart="@+id/main_image_dial" style="@android:style/Widget.DeviceDefault.EditText"/>
+    <Button
+            android:text="Compass Me"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/button2" android:layout_alignBaseline="@+id/editText"
+            android:layout_alignBottom="@+id/editText" android:layout_alignEnd="@+id/main_image_dial"
+            style="@style/Widget.AppCompat.Button.Borderless"/>
 
 </RelativeLayout>
