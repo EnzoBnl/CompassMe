@@ -16,7 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import java.util.List;
-import java.io.IOException;
+
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -24,15 +24,14 @@ import android.hardware.SensorManager;
 import android.widget.TextView;
 
 public class CompassActivity extends AppCompatActivity implements SensorEventListener, StepListener {
-    private Location current_location;
+    private Location currentLocation;
     private Compass compass;
-    private ImageView arrowView;
+    private ImageView arrowImageView;
     private EditText addressSearchZone;
-    private Button compassMe;
+    private Button compassMeButton;
     private float currentAzimuth;
-    private Location target_location = new Location("");
+    private Location targetLocation = new Location("");
     private final static int TARGET_REFRESH_DELAY = 3000;
-
     private TextView textView;
     private StepSensor simpleStepDetector;
     private SensorManager sensorManager;
@@ -43,6 +42,7 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.targetNorth();
         if (CompassActivity.this.checkSelfPermission(Manifest.permission.INTERNET)
                 != PackageManager.PERMISSION_GRANTED) {
             CompassActivity.this.requestPermissions(new String[]{Manifest.permission.INTERNET},
@@ -54,22 +54,27 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
                     1);
         }
         setContentView(R.layout.activity_compass);
-        arrowView = (ImageView) findViewById(R.id.main_image_hands);
+        arrowImageView = (ImageView) findViewById(R.id.main_image_hands);
         setupCompass();
         addressSearchZone = (EditText) findViewById(R.id.editText);
-        compassMe = (Button) findViewById(R.id.button2);
-        compassMe.setOnClickListener(new View.OnClickListener() {
+        compassMeButton = (Button) findViewById(R.id.button2);
+        compassMeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Geocoder geocoder = new Geocoder(CompassActivity.this);
-                List<Address> addresses = null;
-                try{
-                    addresses = geocoder.getFromLocationName(addressSearchZone.getText().toString(), 1);
+                if(addressSearchZone.getText().toString().length() == 0){
+                    CompassActivity.this.targetNorth();
                 }
-                catch(IOException e){}
-                if(addresses != null && addresses.size() > 0) {
-                    CompassActivity.this.target_location.setLatitude(addresses.get(0).getLatitude());
-                    CompassActivity.this.target_location.setLongitude(addresses.get(0).getLongitude());
+                else {
+                    Geocoder geocoder = new Geocoder(CompassActivity.this);
+                    List<Address> addresses = null;
+                    try {
+                        addresses = geocoder.getFromLocationName(addressSearchZone.getText().toString(), 1);
+                    } catch (Exception e) {
+                    }
+                    if (addresses != null && addresses.size() > 0) {
+                        CompassActivity.this.targetLocation.setLatitude(addresses.get(0).getLatitude());
+                        CompassActivity.this.targetLocation.setLongitude(addresses.get(0).getLongitude());
+                    }
                 }
             }
         });
@@ -116,18 +121,27 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
     protected void update(){
         LocationManager locationManager = (LocationManager)CompassActivity.this.getSystemService(LOCATION_SERVICE);
         try {
-            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            if(location != null) {
-                current_location = location;
+            Location location=null;
+            try {
+                location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             }
-            CompassActivity.this.compass.setAzimuthFix(-current_location.bearingTo(CompassActivity.this.target_location));
+            catch(SecurityException e){}
+            if (location != null) {
+                currentLocation = location;
+            }
+            CompassActivity.this.compass.setBearing(-currentLocation.bearingTo(CompassActivity.this.targetLocation));
         }
-        catch(SecurityException e){}
+        catch(Exception e){}
+
+    }
+
+    protected void targetNorth(){
+        targetLocation.setLatitude(90);
+        targetLocation.setLongitude(0.0f);
     }
     @Override
     protected void onStart() {
         super.onStart();
-        //Log.d(TAG, "start com.remienzo.compass");
         compass.start();
     }
 
@@ -146,17 +160,16 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
     @Override
     protected void onStop() {
         super.onStop();
-        //Log.d(TAG, "stop com.remienzo.compass");
         compass.stop();
     }
 
     private void setupCompass() {
         compass = new Compass(this);
-        Compass.CompassListener cl = new Compass.CompassListener() {
+        CompassListener cl = new CompassListener() {
 
             @Override
-            public void onNewAzimuth(float azimuth) {
-                adjustArrow(azimuth);
+            public void onNewBearing(float bearing) {
+                adjustArrow(bearing);
             }
         };
         compass.setListener(cl);
@@ -174,7 +187,7 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
         an.setRepeatCount(0);
         an.setFillAfter(true);
 
-        arrowView.startAnimation(an);
+        arrowImageView.startAnimation(an);
     }
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
