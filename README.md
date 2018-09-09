@@ -13,7 +13,7 @@ Find your way
  2. Walk
 
 ## Screens
-![](https://github.com/EnzoBnl/CompassMe/blob/master/screens/screen1.png)
-![](https://github.com/EnzoBnl/CompassMe/blob/master/screens/screen2.png)
-![](https://github.com/EnzoBnl/CompassMe/blob/master/screens/screen3.png)
-![](https://github.com/EnzoBnl/CompassMe/blob/master/screens/screen4.png)
+![](https://github.com/EnzoBnl/CompassMe/blob/master/screens/screen 1.png)
+![](https://github.com/EnzoBnl/CompassMe/blob/master/screens/screen 2.png)
+![](https://github.com/EnzoBnl/CompassMe/blob/master/screens/screen 3.png)
+![](https://github.com/EnzoBnl/CompassMe/blob/master/screens/screen 4.png)
